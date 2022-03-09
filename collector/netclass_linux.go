@@ -11,16 +11,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// +build !nonetclass
-// +build linux
+//go:build !nonetclass && linux
+// +build !nonetclass,linux
 
 package collector
 
 import (
 	"fmt"
 	"regexp"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/log"
 	"github.com/prometheus/procfs/sysfs"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -56,11 +58,13 @@ func NewNetClassCollector() (Collector, error) {
 }
 
 func (c *netClassCollector) Update(ch chan<- prometheus.Metric) error {
+	log.Debugf(" start get netclass info, time:%s", time.Now().UTC())
 	netClass, err := c.getNetClassInfo()
 	if err != nil {
 		return fmt.Errorf("could not get net class info: %s", err)
 	}
 	for _, ifaceInfo := range netClass {
+		log.Debugf(" start get netclass info, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 		upDesc := prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, c.subsystem, "up"),
 			"Value is 1 if operstate is 'up', 0 otherwise.",
@@ -85,71 +89,88 @@ func (c *netClassCollector) Update(ch chan<- prometheus.Metric) error {
 		ch <- prometheus.MustNewConstMetric(infoDesc, prometheus.GaugeValue, infoValue, ifaceInfo.Name, ifaceInfo.Address, ifaceInfo.Broadcast, ifaceInfo.Duplex, ifaceInfo.OperState, ifaceInfo.IfAlias)
 
 		if ifaceInfo.AddrAssignType != nil {
+			log.Debugf(" start get netclass info: address_assign_type, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "address_assign_type", *ifaceInfo.AddrAssignType, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.Carrier != nil {
+			log.Debugf(" start get netclass info: carrier, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "carrier", *ifaceInfo.Carrier, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.CarrierChanges != nil {
+			log.Debugf(" start get netclass info: carrier_changes_total, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "carrier_changes_total", *ifaceInfo.CarrierChanges, ifaceInfo.Name, prometheus.CounterValue)
 		}
 
 		if ifaceInfo.CarrierUpCount != nil {
+			log.Debugf(" start get netclass info: carrier_up_changes_total, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "carrier_up_changes_total", *ifaceInfo.CarrierUpCount, ifaceInfo.Name, prometheus.CounterValue)
 		}
 
 		if ifaceInfo.CarrierDownCount != nil {
+			log.Debugf(" start get netclass info: carrier_down_changes_total, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "carrier_down_changes_total", *ifaceInfo.CarrierDownCount, ifaceInfo.Name, prometheus.CounterValue)
 		}
 
 		if ifaceInfo.DevID != nil {
+			log.Debugf(" start get netclass info: device_id, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "device_id", *ifaceInfo.DevID, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.Dormant != nil {
+			log.Debugf(" start get netclass info: dormant, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "dormant", *ifaceInfo.Dormant, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.Flags != nil {
+			log.Debugf(" start get netclass info: flags, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "flags", *ifaceInfo.Flags, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.IfIndex != nil {
+			log.Debugf(" start get netclass info: iface_id, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "iface_id", *ifaceInfo.IfIndex, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.IfLink != nil {
+			log.Debugf(" start get netclass info: iface_link, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "iface_link", *ifaceInfo.IfLink, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.LinkMode != nil {
+			log.Debugf(" start get netclass info: iface_link_mode, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "iface_link_mode", *ifaceInfo.LinkMode, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.MTU != nil {
+			log.Debugf(" start get netclass info: mtu_bytes, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "mtu_bytes", *ifaceInfo.MTU, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.NameAssignType != nil {
+			log.Debugf(" start get netclass info: name_assign_type, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "name_assign_type", *ifaceInfo.NameAssignType, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.NetDevGroup != nil {
+			log.Debugf(" start get netclass info: net_dev_group, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "net_dev_group", *ifaceInfo.NetDevGroup, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.Speed != nil {
+			log.Debugf(" start get netclass info: speed_bytes, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			speedBytes := int64(*ifaceInfo.Speed / 8 * 1000 * 1000)
 			pushMetric(ch, c.subsystem, "speed_bytes", speedBytes, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.TxQueueLen != nil {
+			log.Debugf(" start get netclass info: transmit_queue_length, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "transmit_queue_length", *ifaceInfo.TxQueueLen, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 
 		if ifaceInfo.Type != nil {
+			log.Debugf(" start get netclass info: protocol_type, iface: %v, time:%s", ifaceInfo.Name, time.Now().UTC())
 			pushMetric(ch, c.subsystem, "protocol_type", *ifaceInfo.Type, ifaceInfo.Name, prometheus.GaugeValue)
 		}
 	}
